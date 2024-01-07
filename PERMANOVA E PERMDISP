@@ -1,0 +1,191 @@
+#PERMANOVA 2024
+# Instale as bibliotecas se ainda não estiverem instaladas
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+if (!requireNamespace("httr", quietly = TRUE)) {
+  install.packages("httr")
+}
+
+# Carregue as bibliotecas
+library(readxl)
+library(httr)
+# Instale as bibliotecas se ainda não estiverem instaladas
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+if (!requireNamespace("httr", quietly = TRUE)) {
+  install.packages("httr")
+}
+
+# Carregue as bibliotecas
+library(readxl)
+library(httr)
+library(vegan)
+library(readxl)
+options(scipen = 999)
+
+
+# Defina os URLs dos arquivos no GitHub
+URL_Cov_Pampa <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_COV_PAMPA.xlsx"
+URL_amb_Pampa <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_amb_Pampa.xlsx"
+URL_Trat_pampa <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/Trat_total_Pampa.xlsx"
+URL_LF_Pampa <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_LF_PAMPA.xlsx"
+URL_Cov_CCS <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_COV_CCS.xlsx"
+URL_amb_CCS <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_amb_CCS.xlsx"
+URL_Trat_CCS <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/Trat_total_CCS.xlsx"
+URL_LF_CCS <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/PERMANOVA_LF_CCS.xlsx"
+URL_COV_GERAL <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/dados_gerairs_PERMANOVA.xlsx"
+URL_LF_GERAL <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/dados_gerairs_PERMANOVA_LF.xlsx"
+URL_amb_GERAL <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/dados_gerairs_PERMANOVA_amb.xlsx"
+URL_trat_total <- "https://github.com/Ferreirabioufrgs/DadosPERMANOVAcap1DOC/raw/main/Trat_total.xlsx"
+
+
+# Lista de URLs
+urls <- c(URL_Cov_Pampa, URL_amb_Pampa, URL_Trat_pampa, URL_LF_Pampa, 
+          URL_Cov_CCS, URL_amb_CCS, URL_Trat_CCS, URL_LF_CCS, 
+          URL_COV_GERAL, URL_LF_GERAL, URL_amb_GERAL, URL_trat_total)
+
+# Função para baixar e ler dados
+baixar_e_ler <- function(url) {
+  response <- httr::GET(url)
+  content <- httr::content(response, "raw")
+  temp_file <- tempfile(fileext = ".xlsx")
+  writeBin(content, temp_file)
+  return(readxl::read_excel(temp_file))
+}
+
+# Aplicar a função para cada URL
+dados_COV_Pampa <- baixar_e_ler(URL_Cov_Pampa)
+dados_COV_Pampa2=dados_COV_Pampa
+dados_COV_Pampa2$Code=NULL;dados_COV_Pampa2$Tratamento=NULL; rownames(dados_COV_Pampa2)=dados_COV_Pampa$Code
+
+dados_amb_Pampa <- baixar_e_ler(URL_amb_Pampa)
+dados_amb_Pampa2=dados_amb_Pampa
+dados_amb_Pampa2$Code=NULL;dados_amb_Pampa2$Tratamento=NULL; rownames(dados_amb_Pampa2)=dados_amb_Pampa$Code
+
+dados_Trat_Pampa <- baixar_e_ler(URL_Trat_pampa)
+dados_Trat_Pampa2=dados_Trat_Pampa
+dados_Trat_Pampa2$Code=NULL;dados_Trat_Pampa2$Tratamento=NULL; rownames(dados_Trat_Pampa2)=dados_Trat_Pampa$Code
+
+dados_trat_total <- baixar_e_ler(URL_trat_total)
+dados_trat_total2=dados_trat_total
+dados_trat_total2$Code=NULL;dados_trat_total2$Tratamento=NULL; rownames(dados_trat_total2)=dados_trat_total$Code
+
+dados_LF_Pampa <- baixar_e_ler(URL_LF_Pampa)
+dados_LF_Pampa2=dados_LF_Pampa
+dados_LF_Pampa2$Code=NULL;dados_LF_Pampa2$Tratamento=NULL; rownames(dados_LF_Pampa2)=dados_LF_Pampa$Code
+
+
+dados_COV_CCS <- baixar_e_ler(URL_Cov_CCS)
+dados_COV_CCS2=dados_COV_CCS
+dados_COV_CCS2$Code=NULL;dados_COV_CCS2$Tratamento=NULL; rownames(dados_COV_CCS2)=dados_COV_CCS$Code
+
+dados_amb_CCS <- baixar_e_ler(URL_amb_CCS)
+dados_amb_CCS2=dados_amb_CCS
+dados_amb_CCS2$Code=NULL;dados_amb_CCS2$Tratamento=NULL; rownames(dados_amb_CCS2)=dados_amb_CCS$Code
+
+dados_Trat_CCS <- baixar_e_ler(URL_Trat_CCS)
+dados_Trat_CCS2=dados_Trat_CCS
+dados_Trat_CCS2$Code=NULL;dados_Trat_CCS2$Tratamento=NULL; rownames(dados_Trat_CCS2)=dados_Trat_CCS$Code
+
+dados_LF_CCS <- baixar_e_ler(URL_LF_CCS)
+dados_LF_CCS2=dados_LF_CCS
+dados_LF_CCS2$Code=NULL;dados_LF_CCS2$Tratamento=NULL; rownames(dados_LF_CCS2)=dados_LF_CCS$Code
+
+
+dados_COV_GERAL <- baixar_e_ler(URL_COV_GERAL)
+dados_COV_GERAL2=dados_COV_GERAL
+dados_COV_GERAL2$Code=NULL;dados_COV_GERAL2$Tratamento=NULL; rownames(dados_COV_GERAL2)=dados_COV_GERAL$Code
+
+dados_LF_GERAL <- baixar_e_ler(URL_LF_GERAL)
+dados_LF_GERAL2=dados_LF_GERAL
+dados_LF_GERAL2$...1=NULL; rownames(dados_LF_GERAL2)=dados_LF_GERAL$...1
+
+dados_amb_GERAL <- baixar_e_ler(URL_amb_GERAL)
+dados_amb_GERAL2=dados_amb_GERAL
+dados_amb_GERAL2$Code=NULL;dados_amb_GERAL2$Tratamento=NULL; rownames(dados_amb_GERAL2)=dados_amb_GERAL$Code
+# Agora você pode usar cada conjunto de dados em seu script R
+
+
+#PERMANOVA
+
+adonis2(dados_COV_CCS2 ~ Trat_num + R_num + dados_amb_CCS2$BS + dados_amb_CCS2$SDB + dados_amb_CCS2$AHV, 
+        permutations = 9999, 
+        data = dados_Trat_CCS2, method = "bray", add=TRUE, by=NULL)
+
+
+adonis2(dados_COV_Pampa2 ~ Trat_num + R_num + dados_amb_Pampa2$BS + dados_amb_Pampa2$SDB + dados_amb_Pampa2$AHV, 
+        permutations = 9999, 
+        data = dados_Trat_Pampa2, method = "bray", add=TRUE, by=NULL)
+
+
+adonis2(dados_LF_Pampa2 ~ Trat_num + R_num + dados_amb_Pampa2$BS + dados_amb_Pampa2$SDB + dados_amb_Pampa2$AHV, 
+        permutations = 9999, 
+        data = dados_Trat_Pampa2, method = "bray", add=TRUE, by=NULL)
+
+
+adonis2(dados_LF_CCS2 ~ Trat_num + R_num + dados_amb_CCS2$BS + dados_amb_CCS2$SDB + dados_amb_CCS2$AHV, 
+        permutations = 9999, 
+        data = dados_Trat_CCS2, method = "bray", add=TRUE, by=NULL)
+
+
+adonis2(dados_COV_GERAL2 ~ Trat_num + dados_amb_GERAL2$BS + dados_amb_GERAL2$SDB + dados_amb_GERAL2$AHV, 
+        permutations = 9999, 
+        data = dados_trat_total2, method = "bray", add=TRUE, by=NULL)
+
+
+adonis2(dados_LF_GERAL2 ~ Trat_num + dados_amb_GERAL2$BS + dados_amb_GERAL2$SDB + dados_amb_GERAL2$AHV, 
+        permutations = 9999, 
+        data = dados_trat_total2, method = "bray", add=TRUE, by=NULL)
+
+#PERMDISP
+
+diss<-vegdist(dados_COV_CCS2,"bray")
+(perm<-betadisper(diss, group=dados_Trat_CCS2$Trat_num))
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
+
+diss<-vegdist(dados_LF_GERAL2,"bray")
+perm <- betadisper(diss, group = dados_trat_total2$Trat_num)
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
+
+
+diss<-vegdist(dados_COV_GERAL2,"bray")
+(perm<-betadisper(diss, group=dados_trat_total2$Trat_num))
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
+
+diss<-vegdist(dados_Cov_Pampa2,"bray")
+(perm<-betadisper(diss, group=dados_Trat_pampa2$Trat_num))
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
+
+diss<-vegdist(dados_LF_Pampa2,"bray")
+(perm<-betadisper(diss, group=dados_Trat_pampa2$Trat_num))
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
+
+diss<-vegdist(dados_LF_CCS2,"bray")
+(perm<-betadisper(diss, group=dados_Trat_CCS2$Trat_num))
+plot(perm)
+anova(perm)
+TukeyHSD(perm)
+permutest(perm,pairwise=TRUE, permutations=9999)
+boxplot(perm) # deu ruim
